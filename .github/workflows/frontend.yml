@@ -27,7 +27,7 @@ jobs:
         run: cd frontend && npm ci
 
       - name: Lint
-        run: cd frontend && npx next lint --dir .
+        run: cd frontend && npx eslint . --max-warnings=0
 
       - name: Typecheck
         run: cd frontend && npm run typecheck
