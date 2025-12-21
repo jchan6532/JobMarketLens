@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Iterator, Union
+from typing import Iterator, Union
 
 from app.ingestion.types.RawRecord import RawRecord
 
