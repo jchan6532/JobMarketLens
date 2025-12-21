@@ -1,5 +1,6 @@
 from app.ingestion.normalizers.salary import parse_salary
-from app.ingestion.types import CanonicalJob, NormalizedJob
+from app.ingestion.types.CanonicalJob import CanonicalJob
+from app.ingestion.types.NormalizedJob import NormalizedJob
 
 def normalize_job(job: CanonicalJob) -> NormalizedJob:
     salary_range = parse_salary(job.salary_raw)
