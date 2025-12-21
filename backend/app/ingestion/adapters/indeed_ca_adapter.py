@@ -2,23 +2,10 @@ from __future__ import annotations
 
 import datetime
 import re
-from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from app.ingestion.loaders.csv_loader import RawRecord
-
-
-@dataclass(frozen=True)
-class CanonicalJob:
-    title: str
-    company: str
-    description: str
-    city: str
-    province: str
-    country: str
-    posted_date: Optional[datetime.date]
-    source_name: str
-    source_job_id: str
+from app.ingestion.types.RawRecord import RawRecord
+from app.ingestion.types.CanonicalJob import CanonicalJob
 
 
 _LOC_RE = re.compile(r"^\s*(?P<city>.+?)\s*,\s*(?P<prov>[A-Za-z]{2})\s*$")
@@ -75,6 +62,7 @@ def adapt_indeed_ca(raw: RawRecord) -> CanonicalJob:
     description = (p.get("Summary") or "").strip()
     location = (p.get("Location") or "").strip()
     job_url = (p.get("JobUrl") or "").strip()
+    salary_raw = (p.get("Salary") or "").strip()
 
     if not title or not company or not description or not location or not job_url:
         raise ValueError("Missing one of required fields: JobTitle/Company/Summary/Location/JobUrl")
@@ -89,6 +77,7 @@ def adapt_indeed_ca(raw: RawRecord) -> CanonicalJob:
         province=province,
         country="Canada",
         posted_date=parse_post_date(p.get("PostDate", "")),
+        salary_raw=salary_raw,
         source_name=raw.source,
         source_job_id=job_url,
     )
