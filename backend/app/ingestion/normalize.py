@@ -6,7 +6,7 @@ def normalize_job(job: CanonicalJob) -> NormalizedJob:
     salary_range = parse_salary(job.salary_raw)
 
     return NormalizedJob(
-        canonical=job,
+        canonical_job=job,
         title_clean=" ".join(job.title.split()).strip(),
         company_clean=" ".join(job.company.split()).strip(),
         city_clean=job.city.strip(),
