@@ -62,6 +62,7 @@ def adapt_indeed_ca(raw: RawRecord) -> CanonicalJob:
     description = (p.get("Summary") or "").strip()
     location = (p.get("Location") or "").strip()
     job_url = (p.get("JobUrl") or "").strip()
+    salary_raw = (p.get("Salary") or "").strip()
 
     if not title or not company or not description or not location or not job_url:
         raise ValueError("Missing one of required fields: JobTitle/Company/Summary/Location/JobUrl")
@@ -76,6 +77,7 @@ def adapt_indeed_ca(raw: RawRecord) -> CanonicalJob:
         province=province,
         country="Canada",
         posted_date=parse_post_date(p.get("PostDate", "")),
+        salary_raw=salary_raw,
         source_name=raw.source,
         source_job_id=job_url,
     )
