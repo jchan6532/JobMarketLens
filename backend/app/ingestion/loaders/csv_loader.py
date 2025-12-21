@@ -1,18 +1,11 @@
 from __future__ import annotations
 
 import csv
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Iterator, Union
 
-
-@dataclass(frozen=True)
-class RawRecord:
-    source: str
-    payload: Dict[str, str]
-    fetched_at_utc: str
-
+from app.ingestion.types.RawRecord import RawRecord
 
 REQUIRED_COLUMNS = {
     "JobTitle",

@@ -2,23 +2,10 @@ from __future__ import annotations
 
 import datetime
 import re
-from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from app.ingestion.loaders.csv_loader import RawRecord
-
-
-@dataclass(frozen=True)
-class CanonicalJob:
-    title: str
-    company: str
-    description: str
-    city: str
-    province: str
-    country: str
-    posted_date: Optional[datetime.date]
-    source_name: str
-    source_job_id: str
+from app.ingestion.types.RawRecord import RawRecord
+from app.ingestion.types.CanonicalJob import CanonicalJob
 
 
 _LOC_RE = re.compile(r"^\s*(?P<city>.+?)\s*,\s*(?P<prov>[A-Za-z]{2})\s*$")
