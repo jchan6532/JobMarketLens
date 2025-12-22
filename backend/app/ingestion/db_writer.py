@@ -32,7 +32,7 @@ def upsert_job_posting(db: Session, normalized_job: NormalizedJob) -> None:
     )
 
     statement = statement.on_conflict_do_update(
-        index_elements=["source_name", "source_job_id"],
+        constraint="uq_job_source",
         set_={
             "title": statement.excluded.title,
             "company": statement.excluded.company,
@@ -45,6 +45,17 @@ def upsert_job_posting(db: Session, normalized_job: NormalizedJob) -> None:
             "salary_max": statement.excluded.salary_max,
             "salary_raw": statement.excluded.salary_raw,
         },
+        where=(
+            (JobPosting.title != statement.excluded.title) |
+            (JobPosting.company != statement.excluded.company) |
+            (JobPosting.description != statement.excluded.description) |
+            (JobPosting.city != statement.excluded.city) |
+            (JobPosting.province != statement.excluded.province) |
+            (JobPosting.posted_date != statement.excluded.posted_date) |
+            (JobPosting.salary_min != statement.excluded.salary_min) |
+            (JobPosting.salary_max != statement.excluded.salary_max) |
+            (JobPosting.salary_raw != statement.excluded.salary_raw)
+        )
     )
 
     db.execute(statement)
