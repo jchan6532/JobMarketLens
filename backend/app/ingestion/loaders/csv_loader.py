@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterator, Union
+from typing import Iterator
 
 from app.ingestion.types.RawRecord import RawRecord
 
@@ -19,7 +19,7 @@ REQUIRED_COLUMNS = {
 
 
 def load_jobs_csv(
-    path: Union[str, Path],
+    path: str | Path,
     *,
     source: str,
     encoding: str = "utf-8",
