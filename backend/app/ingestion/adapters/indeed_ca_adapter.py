@@ -11,19 +11,29 @@ from app.ingestion.types.CanonicalJob import CanonicalJob
 _LOC_RE = re.compile(r"^\s*(?P<city>.+?)\s*,\s*(?P<prov>[A-Za-z]{2})\s*$")
 
 
-def split_location(location: str) -> Tuple[str, str]:
+def split_location(location: str) -> Tuple[str | None, str | None]:
     """
     Expects formats like: 'Toronto, ON'
     Returns (city, province). Raises if bad format.
     """
     s = (location or "").strip()
 
-    if s.lower() in {"remote", "canada remote", "remote (canada)", "canada, remote"}:
-        return "Remote", "NA"
+    if not s:
+        return None, None
     
-    m = _LOC_RE.match(location or "")
+    if s.lower() in {
+        "remote",
+        "canada",
+        "canada remote",
+        "remote (canada)",
+        "canada, remote",
+    }:
+        return "Remote", None
+    
+    m = _LOC_RE.match(s)
     if not m:
-        raise ValueError(f"Unrecognized location format: {location!r}")
+        return s, None
+    
     return m.group("city").strip(), m.group("prov").upper().strip()
 
 

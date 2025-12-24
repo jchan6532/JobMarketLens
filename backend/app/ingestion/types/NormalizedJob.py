@@ -8,8 +8,8 @@ class NormalizedJob:
 
     # Derived fields
     title_clean: str
-    company_clean: str
-    city_clean: str
-    province_clean: str
+    company_clean: str | None
+    city_clean: str | None
+    province_clean: str | None
 
     salary_range: SalaryRange
