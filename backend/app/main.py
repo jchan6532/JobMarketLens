@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.ingestion import router as ingestion_router
+from app.api.job import router as job_router
 
 app = FastAPI(
     title="JobMarketLens API",
@@ -23,6 +24,7 @@ app.add_middleware(
 )
 
 app.include_router(ingestion_router)
+app.include_router(job_router)
 
 @app.get("/")
 def root():
