@@ -5,31 +5,49 @@ from app.db.base import Base
 
 class JobPosting(Base):
     __tablename__ = "job_postings"
+    
     __table_args__ = (
         UniqueConstraint("source_name", "source_job_id", name="uq_job_source"),
     )
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    title: Mapped[str] = mapped_column(String(255))
-
-    company: Mapped[str] = mapped_column(String(255))
-
-    description: Mapped[str] = mapped_column(Text)
-
-    city: Mapped[str] = mapped_column(
-        String(100), 
-        index=True
+    id: Mapped[int] = mapped_column(
+        Integer, 
+        primary_key=True
     )
 
-    province: Mapped[str] = mapped_column(
+    title: Mapped[str] = mapped_column(
+        String(255), 
+        nullable=False
+    )
+
+    company: Mapped[str | None] = mapped_column(
+        String(255), 
+        nullable=True
+    )
+
+    description: Mapped[str | None] = mapped_column(
+        Text, 
+        nullable=True
+    )
+
+    city: Mapped[str | None] = mapped_column(
         String(100), 
-        index=True
+        index=True,
+        nullable=True
+    )
+
+    province: Mapped[str | None] = mapped_column(
+        String(100), 
+        index=True,
+        nullable=True
     )
 
     country: Mapped[str] = mapped_column(
         String(100), 
-        default="Canada"
+        default="Canada",
+        server_default="Canada",
+        index=True,
+        nullable=False
     )
 
     salary_min: Mapped[int | None] = mapped_column(
@@ -53,7 +71,7 @@ class JobPosting(Base):
         index=True
     )
     
-    role_category: Mapped[str | None] = mapped_column(String(50))
+    role_category: Mapped[str | None] = mapped_column(String(50), nullable=True, index=True)
 
     source_name: Mapped[str] = mapped_column(
         String(100), 
@@ -62,12 +80,13 @@ class JobPosting(Base):
     )
 
     source_job_id: Mapped[str] = mapped_column(
-        String(500), 
+        Text, 
         nullable=False
     )
 
-    skills = relationship(
+    job_skills = relationship(
         "JobSkill",
         back_populates="job",
         cascade="all, delete-orphan",
     )
+
