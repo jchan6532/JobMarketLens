@@ -9,7 +9,7 @@ def normalize_job(job: CanonicalJob) -> NormalizedJob:
         canonical_job=job,
         title_clean=" ".join(job.title.split()).strip(),
         company_clean=" ".join(job.company.split()).strip(),
-        city_clean=job.city.strip(),
+        city_clean=job.city.strip().lower(),
         province_clean=job.province.strip().upper(),
         salary_range=salary_range,
     )

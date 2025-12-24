@@ -78,6 +78,6 @@ def adapt_indeed_ca(raw: RawRecord) -> CanonicalJob:
         country="Canada",
         posted_date=parse_post_date(p.get("PostDate", "")),
         salary_raw=salary_raw,
-        source_name=raw.source,
+        source_name=raw.source.strip().lower(),
         source_job_id=job_url,
     )

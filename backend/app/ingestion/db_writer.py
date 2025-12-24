@@ -14,11 +14,11 @@ def upsert_job_posting(db: Session, normalized_job: NormalizedJob) -> None:
     canonical_job = normalized_job.canonical_job
 
     statement = insert(JobPosting).values(
-        title=canonical_job.title,
-        company=canonical_job.company,
+        title=normalized_job.title_clean,
+        company=normalized_job.company_clean,
         description=canonical_job.description,
-        city=canonical_job.city,
-        province=canonical_job.province,
+        city=normalized_job.city_clean,
+        province=normalized_job.province_clean,
         country=canonical_job.country,
         posted_date=canonical_job.posted_date,
         role_category=None,
