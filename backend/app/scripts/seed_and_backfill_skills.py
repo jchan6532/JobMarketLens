@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from app.db.session import SessionLocal
-from app.scripts.seed_skills import seed_skills
-from app.scripts.backfill_job_skills import backfill_job_skills
+from app.scripts.utils.seed_skills import seed_skills
+from app.scripts.utils.backfill_job_skills import backfill_job_skills
 
 
 def main() -> None:
