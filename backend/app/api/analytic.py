@@ -7,9 +7,12 @@ from datetime import date
 
 from app.db.session import get_db
 from app.db.models.job_posting import JobPosting
+from app.db.models.skill import Skill
+from app.db.models.job_skill import JobSkill
 from app.schemas.analytic import (
     RoleCount, 
-    CityCount
+    CityCount,
+    SkillCount
 )
 
 
@@ -17,6 +20,53 @@ router = APIRouter(
     prefix="/analytics", 
     tags=["analytics"]
 )
+
+@router.get("/top-skills", response_model=list[SkillCount])
+def get_top_skills(
+    limit: int = Query(10, ge=1, le=100),
+    city: str | None = None,
+    role_category: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    db: Session = Depends(get_db)
+) -> list[SkillCount]:
+    query = (
+        db.query(
+            Skill.slug.label("slug"),
+            Skill.name.label("name"),
+            Skill.category.label("category"),
+            func.count(func.distinct(JobSkill.job_id)).label("job_count"),
+        )
+        .select_from(JobSkill)
+        .join(Skill, Skill.id == JobSkill.skill_id)
+        .join(JobPosting, JobPosting.id == JobSkill.job_id)
+    )
+
+    if city:
+        query = query.filter(JobPosting.city == city)
+    if role_category:
+        query = query.filter(JobPosting.role_category == role_category)
+    if date_from:
+        query = query.filter(JobPosting.posted_date >= date_from)
+    if date_to:
+        query = query.filter(JobPosting.posted_date <= date_to)
+
+    rows = (
+        query
+        .group_by(Skill.slug, Skill.name, Skill.category)
+        .order_by(desc("job_count"))
+        .limit(limit)
+        .all()
+    )
+
+    return [
+        SkillCount(
+            slug=row.slug, 
+            name=row.name, 
+            category=row.category, 
+            count=int(row.job_count)
+        ) for row in rows
+    ]
 
 
 @router.get("/top-cities", response_model=list[CityCount])
@@ -47,7 +97,12 @@ def get_top_cities(
         .all()
     )
 
-    return [CityCount(city=row.city, count=int(row.job_count)) for row in rows]
+    return [
+        CityCount(
+            city=row.city, 
+            count=int(row.job_count)
+        ) for row in rows
+    ]
 
 @router.get("/top-roles", response_model=list[RoleCount])
 def get_top_roles(
@@ -77,4 +132,9 @@ def get_top_roles(
         .all()
     )
 
-    return [RoleCount(role_category=row.role_category, count=int(row.job_count)) for row in rows]
+    return [
+        RoleCount(
+            role_category=row.role_category, 
+            count=int(row.job_count)
+        ) for row in rows
+    ]
