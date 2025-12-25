@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, cast, Date
 from sqlalchemy.orm import Session
 from datetime import date
 
@@ -12,7 +12,8 @@ from app.db.models.job_skill import JobSkill
 from app.schemas.analytic import (
     RoleCount, 
     CityCount,
-    SkillCount
+    SkillCount,
+    SkillTrendPoint
 )
 
 
@@ -68,6 +69,64 @@ def get_top_skills(
         ) for row in rows
     ]
 
+@router.get("/skill-trend", response_model=list[SkillTrendPoint])
+def get_skill_trend(
+    skill: str = Query(
+        ..., 
+        alias="skill_slug", 
+        min_length=1, 
+        description="Skill slug (e.g. python, react, docker)"
+    ),
+    city: str | None = None,
+    role_category: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    db: Session = Depends(get_db)
+) -> list[SkillTrendPoint]:
+    month_start = cast(
+        func.date_trunc(
+            'month', 
+            JobPosting.posted_date
+        ), 
+        Date
+    ).label("period_start")
+
+    query = (
+        db.query(
+            month_start,
+            func.count(func.distinct(JobPosting.id)).label("job_count"),
+        )
+        .select_from(JobSkill)
+        .join(Skill, Skill.id == JobSkill.skill_id)
+        .join(JobPosting, JobPosting.id == JobSkill.job_id)
+        .filter(JobPosting.posted_date.isnot(None))
+        .filter(
+            (Skill.slug == skill) | (Skill.name.ilike(skill))
+        )
+    )
+
+    if city:
+        query = query.filter(JobPosting.city == city)
+    if role_category:
+        query = query.filter(JobPosting.role_category == role_category)
+    if date_from:
+        query = query.filter(JobPosting.posted_date >= date_from)
+    if date_to:
+        query = query.filter(JobPosting.posted_date <= date_to)
+
+    rows = (
+        query
+        .group_by(month_start)
+        .order_by(month_start.asc())
+        .all()
+    )
+
+    return [
+        SkillTrendPoint(
+            period_start=row.period_start, 
+            count=int(row.job_count)
+        ) for row in rows
+    ]
 
 @router.get("/top-cities", response_model=list[CityCount])
 def get_top_cities(
