@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from typing import Literal
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, desc, cast, Date
 from sqlalchemy.orm import Session
@@ -79,21 +79,26 @@ def get_skill_trend(
     ),
     city: str | None = None,
     role_category: str | None = None,
+    granularity: Literal["month", "week"] = Query(
+        "month",
+        description="Granularity of the trend data"
+    ),
     date_from: date | None = None,
     date_to: date | None = None,
     db: Session = Depends(get_db)
 ) -> list[SkillTrendPoint]:
-    month_start = cast(
+
+    period_start = cast(
         func.date_trunc(
-            'month', 
+            granularity, 
             JobPosting.posted_date
-        ), 
-        Date
+        ),
+        Date,
     ).label("period_start")
 
     query = (
         db.query(
-            month_start,
+            period_start,
             func.count(func.distinct(JobPosting.id)).label("job_count"),
         )
         .select_from(JobSkill)
@@ -116,8 +121,8 @@ def get_skill_trend(
 
     rows = (
         query
-        .group_by(month_start)
-        .order_by(month_start.asc())
+        .group_by(period_start)
+        .order_by(period_start.asc())
         .all()
     )
 
