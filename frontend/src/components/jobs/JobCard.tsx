@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { JobSummary } from '@/types/JobSummary';
+import { JobSummary } from '@/types/jobs/JobSummary';
 
 type Props = {
   job: JobSummary;

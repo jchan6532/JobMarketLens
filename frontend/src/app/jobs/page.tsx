@@ -1,5 +1,5 @@
 import JobCard from '@/components/jobs/JobCard';
-import { JobSummary } from '@/types/JobSummary';
+import { JobSummary } from '@/types/jobs/JobSummary';
 
 const MOCK: JobSummary[] = [
   {
