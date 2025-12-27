@@ -15,9 +15,9 @@ export async function apiGet<T>(path: string): Promise<T> {
   try {
     const res = await api.get<T>(path);
     return res.data;
-  } catch (err: any) {
-    if (err.response) {
-      throw new Error(`API error ${err.response.status} on GET ${path}`);
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      throw new Error(`API error ${err.response?.status} on GET ${path}`);
     }
     throw err;
   }
